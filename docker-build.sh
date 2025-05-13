@@ -18,11 +18,11 @@
 #
 # Usage:
 #
-#  ./build.sh <version>
+#  ./docker-build.sh <version>
 #
 # Example:
 #
-#   ./build.sh 1.5.0
+#   ./docker-build.sh 1.5.0
 #
 
 DEFAULT_VERSION=1.5.0

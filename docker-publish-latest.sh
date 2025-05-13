@@ -15,11 +15,11 @@
 #
 # Usage:
 #
-#  ./publish-latest.sh <version>
+#  ./docker-publish-latest.sh <version>
 #
 # Example:
 #
-#   ./publish-latest.sh 1.5.0
+#   ./docker-publish-latest.sh 1.5.0
 #
 
 DEFAULT_VERSION=1.5.0

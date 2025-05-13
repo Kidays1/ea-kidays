@@ -18,7 +18,7 @@
 #
 # Usage:
 #
-#  ./build-setup.sh
+#  ./docker-setup-builder.sh
 #
 
 # Ensure QEMU is installed and configured:
