@@ -30,6 +30,7 @@ class Config {
     const LANGUAGE              = '${LANGUAGE}';
     const DEBUG_MODE            = ${DEBUG_MODE};
     const DB_HOST               = '${DB_HOST}';
+    const DB_PORT               = '${DB_PORT}';
     const DB_NAME               = '${DB_NAME}';
     const DB_USERNAME           = '${DB_USERNAME}';
     const DB_PASSWORD           = '${DB_PASSWORD}';
@@ -78,4 +79,4 @@ fi
 
 # Start Apache
 
-apache2-foreground
+exec apache2-foreground
