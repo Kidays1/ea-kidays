@@ -42,7 +42,7 @@ RUN apt-get update \
 	&& curl -sSL https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions -o - | sh -s \
       curl gd intl ldap mbstring mysqli xdebug odbc pdo pdo_mysql xml zip exif gettext bcmath csv event imap inotify mcrypt redis \
     && docker-php-ext-enable xdebug \
-    && wget https://github.com/alextselegidis/easyappointments/releases/download/${VERSION}/easyappointments-${VERSION}.zip \
+    && wget -O easyappointments-${VERSION}.zip "https://sourceforge.net/projects/easyappointments.mirror/files/${VERSION}/easyappointments-${VERSION}.zip/download" \
     && unzip easyappointments-${VERSION}.zip \
     && rm easyappointments-${VERSION}.zip \
     && echo "alias ll=\"ls -al\"" >> /root/.bashrc \
