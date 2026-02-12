@@ -1,15 +1,25 @@
 #!/bin/sh
 
-# Generate config.php from Railway env variables
-cat > /var/www/html/config.php <<EOF
+cd /var/www/html
+
+if [ ! -f config.php ]; then
+cat > config.php <<EOF
 <?php
-define("BASE_URL", getenv("BASE_URL"));
-define("DB_HOST", getenv("MYSQLHOST"));
-define("DB_NAME", getenv("MYSQLDATABASE"));
-define("DB_USERNAME", getenv("MYSQLUSER"));
-define("DB_PASSWORD", getenv("MYSQLPASSWORD"));
-define("DB_PORT", getenv("MYSQLPORT"));
+
+class Config {
+
+    const BASE_URL = '${BASE_URL}';
+    const LANGUAGE = 'english';
+    const DEBUG_MODE = FALSE;
+
+    const DB_HOST = '${MYSQLHOST}';
+    const DB_NAME = '${MYSQLDATABASE}';
+    const DB_USERNAME = '${MYSQLUSER}';
+    const DB_PASSWORD = '${MYSQLPASSWORD}';
+    const DB_PORT = '${MYSQLPORT}';
+}
 EOF
+fi
 
 php-fpm &
 caddy run --config /etc/caddy/Caddyfile
