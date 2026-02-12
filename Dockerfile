@@ -21,11 +21,12 @@ RUN wget -O easyappointments.zip "https://sourceforge.net/projects/easyappointme
     && chown -R www-data:www-data /var/www/html
 
 # Caddy config
-RUN echo ":80 {\n\
-    root * /var/www/html\n\
-    php_fastcgi 127.0.0.1:9000\n\
-    file_server\n\
-}" > /etc/caddy/Caddyfile
+RUN apt-get update \
+    && apt-get install -y curl gnupg \
+    && curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg \
+    && curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list \
+    && apt-get update \
+    && apt-get install -y caddy
 
 EXPOSE 80
 
