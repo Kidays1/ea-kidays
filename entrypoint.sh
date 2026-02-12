@@ -19,6 +19,18 @@ class Config {
   const DB_USERNAME = '${MYSQLUSER}';
   const DB_PASSWORD = '${MYSQLPASSWORD}';
   const DB_PORT = '${MYSQLPORT}';
+
+  // ---- Feature flags expected by EasyAppointments (safe defaults) ----
+  const GOOGLE_SYNC_FEATURE = false;
+  const OUTLOOK_SYNC_FEATURE = false;
+  const ZOOM_FEATURE = false;
+
+  // ---- Optional Google config defaults (empty = disabled) ----
+  const GOOGLE_APPLICATION_NAME = '';
+  const GOOGLE_CLIENT_ID = '';
+  const GOOGLE_CLIENT_SECRET = '';
+  const GOOGLE_REDIRECT_URI = '';
+  const GOOGLE_API_KEY = '';
 }
 EOF
 
