@@ -47,36 +47,62 @@ cat > /var/www/html/__diag.php <<'PHP'
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
-echo "OK: diag reached\n";
+function out($s){ echo $s . "\n"; @ob_flush(); @flush(); }
+
+register_shutdown_function(function () {
+  $e = error_get_last();
+  if ($e) {
+    out("=== PHP LAST ERROR ===");
+    out(print_r($e, true));
+  } else {
+    out("=== PHP LAST ERROR: none ===");
+  }
+});
+
+out("OK: diag reached");
 
 require_once __DIR__ . '/config.php';
-echo "Config loaded\n";
+out("Config loaded");
 
-$host = Config::DB_HOST;
-$db   = Config::DB_NAME;
-$user = Config::DB_USERNAME;
-$pass = Config::DB_PASSWORD;
-$port = Config::DB_PORT;
+$checks = [
+  'curl','mbstring','intl','zip','xml','dom','gd','mysqli','pdo_mysql'
+];
 
-echo "Trying DB... host=$host db=$db user=$user port=$port\n";
+out("=== EXTENSIONS ===");
+foreach ($checks as $ext) {
+  out($ext . ": " . (extension_loaded($ext) ? "YES" : "NO"));
+}
 
+out("=== DB TEST ===");
 try {
-  $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=utf8mb4";
-  $pdo = new PDO($dsn, $user, $pass, [
+  $dsn = "mysql:host=".Config::DB_HOST.";port=".Config::DB_PORT.";dbname=".Config::DB_NAME.";charset=utf8mb4";
+  $pdo = new PDO($dsn, Config::DB_USERNAME, Config::DB_PASSWORD, [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_TIMEOUT => 5
   ]);
-  echo "DB CONNECT: OK\n";
-  $v = $pdo->query("SELECT VERSION()")->fetchColumn();
-  echo "MySQL VERSION: $v\n";
+  out("DB CONNECT: OK");
+  out("MySQL VERSION: " . $pdo->query("SELECT VERSION()")->fetchColumn());
 } catch (Throwable $e) {
-  echo "DB CONNECT: FAIL\n";
-  echo $e->getMessage() . "\n";
+  out("DB CONNECT: FAIL");
+  out($e->getMessage());
 }
 
-echo "\nNow including index.php...\n";
-require __DIR__ . '/index.php';
-echo "\nDONE\n";
+out("=== INCLUDING index.php (buffered) ===");
+ob_start();
+try {
+  require __DIR__ . '/index.php';
+  $buf = ob_get_clean();
+  out("index.php returned normally.");
+  out("=== OUTPUT (first 2000 chars) ===");
+  out(substr($buf, 0, 2000));
+} catch (Throwable $e) {
+  $buf = ob_get_clean();
+  out("THROWABLE while including index.php:");
+  out($e->getMessage());
+  out($e->getTraceAsString());
+}
+out("DONE");
 PHP
+
 php-fpm &
 caddy run --config /etc/caddy/Caddyfile
