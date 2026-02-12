@@ -2,6 +2,12 @@
 set -e
 
 cd /var/www/html
+echo "=== CHECK STATIC FILES ==="
+ls -la /var/www/html/assets || true
+ls -la /var/www/html/assets/css || true
+ls -la /var/www/html/assets/css/style.min.css || true
+echo "=========================="
+
 
 # Toujours régénérer config.php (pas de cache)
 rm -f config.php
