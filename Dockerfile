@@ -1,64 +1,18 @@
-FROM php:8.2-apache
-# Fix Apache: ensure only one MPM is enabled (prefork)
-# Force a single Apache MPM (prefork) – fixes "More than one MPM loaded"
-RUN set -eux; \
-  a2dismod mpm_event mpm_worker || true; \
-  a2enmod mpm_prefork; \
-  rm -f /etc/apache2/mods-enabled/mpm_event.load /etc/apache2/mods-enabled/mpm_event.conf || true; \
-  rm -f /etc/apache2/mods-enabled/mpm_worker.load /etc/apache2/mods-enabled/mpm_worker.conf || true; \
-  ls -la /etc/apache2/mods-enabled/ | grep mpm || true
-
-
-MAINTAINER Alex Tselegidis (alextselegidis.com)
+FROM php:8.2-fpm
 
 ARG VERSION=1.5.2
 
-ENV BASE_URL="http://localhost"
-ENV LANGUAGE="english"
-ENV DEBUG_MODE="FALSE"
-ENV DB_HOST="db"
-ENV DB_PORT="3306"
-ENV DB_NAME="easyappointments"
-ENV DB_USERNAME="root"
-ENV DB_PASSWORD="secret"
-ENV GOOGLE_SYNC_FEATURE=FALSE
-ENV GOOGLE_PRODUCT_NAME=""
-ENV GOOGLE_CLIENT_ID=""
-ENV GOOGLE_CLIENT_SECRET=""
-ENV GOOGLE_API_KEY=""
-ENV MAIL_PROTOCOL="mail"
-ENV MAIL_SMTP_DEBUG="0"
-ENV MAIL_SMTP_AUTH="0"
-ENV MAIL_SMTP_HOST=""
-ENV MAIL_SMTP_USER=""
-ENV MAIL_SMTP_PASS=""
-ENV MAIL_SMTP_CRYPTO="tls"
-ENV MAIL_SMTP_PORT="587"
-ENV MAIL_FROM_ADDRESS=""
-ENV MAIL_FROM_NAME=""
-ENV MAIL_REPLY_TO_ADDRESS=""
-
-EXPOSE 80
+RUN apt-get update \
+    && apt-get install -y unzip wget libpng-dev libjpeg-dev libfreetype6-dev \
+    && docker-php-ext-install pdo pdo_mysql mysqli gd
 
 WORKDIR /var/www/html
 
-COPY ./assets/99-overrides.ini /usr/local/etc/php/conf.d
+RUN wget -O easyappointments.zip "https://sourceforge.net/projects/easyappointments.mirror/files/${VERSION}/easyappointments-${VERSION}.zip/download" \
+    && unzip easyappointments.zip \
+    && rm easyappointments.zip \
+    && chown -R www-data:www-data /var/www/html
 
-COPY ./assets/docker-entrypoint.sh /usr/local/bin
+EXPOSE 9000
 
-RUN apt-get update \
-    && apt-get install -y libfreetype-dev libjpeg62-turbo-dev libpng-dev unzip wget \
-	&& curl -sSL https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions -o - | sh -s \
-      curl gd intl ldap mbstring mysqli xdebug odbc pdo pdo_mysql xml zip exif gettext bcmath csv event imap inotify mcrypt redis \
-    && docker-php-ext-enable xdebug \
-    && wget -O easyappointments-${VERSION}.zip "https://sourceforge.net/projects/easyappointments.mirror/files/${VERSION}/easyappointments-${VERSION}.zip/download" \
-    && unzip easyappointments-${VERSION}.zip \
-    && rm easyappointments-${VERSION}.zip \
-    && echo "alias ll=\"ls -al\"" >> /root/.bashrc \
-    && apt-get -y autoremove \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    && chown -R www-data:www-data .
-
-ENTRYPOINT ["docker-entrypoint.sh"]
-
+CMD ["php-fpm"]
