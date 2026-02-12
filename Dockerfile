@@ -4,18 +4,10 @@ ARG VERSION=1.5.2
 
 # Install system deps + PHP extensions
 RUN apt-get update \
-    && apt-get install -y unzip wget curl gnupg ca-certificates \
+    && apt-get install -y unzip wget curl \
        libpng-dev libjpeg-dev libfreetype6-dev \
+       caddy \
     && docker-php-ext-install pdo pdo_mysql mysqli gd
-
-# Install Caddy properly
-RUN mkdir -p /etc/apt/keyrings \
-    && curl -1sLf https://dl.cloudsmith.io/public/caddy/stable/gpg.key \
-       | gpg --dearmor -o /etc/apt/keyrings/caddy-stable.gpg \
-    && echo "deb [signed-by=/etc/apt/keyrings/caddy-stable.gpg] https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt any-version main" \
-       > /etc/apt/sources.list.d/caddy-stable.list \
-    && apt-get update \
-    && apt-get install -y caddy
 
 WORKDIR /var/www/html
 
