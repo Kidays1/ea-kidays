@@ -19,6 +19,8 @@ RUN mkdir -p /etc/apt/keyrings \
 
 WORKDIR /var/www/html
 
+COPY Caddyfile /etc/caddy/Caddyfile
+
 # Download EasyAppointments
 RUN wget -O easyappointments.zip "https://sourceforge.net/projects/easyappointments.mirror/files/${VERSION}/easyappointments-${VERSION}.zip/download" \
     && unzip easyappointments.zip \
