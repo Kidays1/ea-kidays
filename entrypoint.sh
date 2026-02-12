@@ -1,14 +1,18 @@
 #!/bin/sh
+set -e
 
 cd /var/www/html
 
-if [ ! -f config.php ]; then
+# Toujours régénérer config.php (évite les vieux fichiers cassés)
+rm -f config.php
+
 cat > config.php <<EOF
 <?php
 
 class Config {
 
     const BASE_URL = '${BASE_URL}';
+
     const LANGUAGE = 'english';
     const DEBUG_MODE = false;
 
@@ -20,7 +24,6 @@ class Config {
 
 }
 EOF
-fi
 
 php-fpm &
 caddy run --config /etc/caddy/Caddyfile
